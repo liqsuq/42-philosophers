@@ -10,10 +10,10 @@ $(NAME): $(OBJECT)
 all: $(NAME)
 
 debug-thread:
-	make re CFLAGS="-Wall -Wextra -Werror -g -fsanitize=thread"
+	make re CFLAGS="$(CFLAGS) -g -fsanitize=thread"
 
-debug-address:
-	make re CFLAGS="-Wall -Wextra -Werror -g -fsanitize=address"
+debug:
+	make re CFLAGS="$(CFLAGS) -g -fsanitize=address,leak"
 
 clean:
 	$(RM) $(OBJECT)
