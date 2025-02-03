@@ -6,7 +6,7 @@
 /*   By: kadachi <kadachi@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/02 13:35:39 by kadachi           #+#    #+#             */
-/*   Updated: 2025/02/02 18:57:56 by kadachi          ###   ########.fr       */
+/*   Updated: 2025/02/03 15:55:44 by kadachi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,8 +45,10 @@ static inline int	monitor_full(t_data *d)
 	cnt_full = 0;
 	while (++i < d->num_philos)
 	{
+		pthread_mutex_lock(&d->philos[i].mtx_ate);
 		if (d->num_eat != -1 && d->philos[i].num_ate >= d->num_eat)
 			cnt_full++;
+		pthread_mutex_unlock(&d->philos[i].mtx_ate);
 	}
 	if (d->num_eat != -1 && cnt_full >= d->num_philos)
 	{
