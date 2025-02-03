@@ -6,37 +6,11 @@
 /*   By: kadachi <kadachi@student.42tokyo.jp>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/19 16:56:56 by kadachi           #+#    #+#             */
-/*   Updated: 2025/01/27 17:24:02 by kadachi          ###   ########.fr       */
+/*   Updated: 2025/02/02 18:57:55 by kadachi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
-
-int	ft_atoi(const char *nptr)
-{
-	int		sign;
-	int		num;
-
-	sign = 1;
-	num = 0;
-	while (*nptr == ' ' || *nptr == '\f' || *nptr == '\n'
-		|| *nptr == '\r' || *nptr == '\t' || *nptr == '\v')
-		nptr++;
-	if (*nptr == '+' || *nptr == '-')
-	{
-		if (*nptr == '-')
-			sign *= -1;
-		nptr++;
-	}
-	while (*nptr >= '0' && *nptr <= '9')
-	{
-		num *= 10;
-		num += *nptr - '0';
-		nptr++;
-	}
-	num *= sign;
-	return (num);
-}
 
 long long	gettime_ms(void)
 {
@@ -52,15 +26,30 @@ void	msleep(unsigned int ms)
 
 	start = gettime_ms();
 	while ((gettime_ms() - start) < ms)
-		usleep(100);
+		usleep(10);
 }
 
-void	print_status(t_philo *philo, char *str)
+int	check_end(t_data *d)
 {
-	if (!philo->data->is_dead)
-	{
-		pthread_mutex_lock(&philo->data->mtx_print);
-		printf("%lld %d %s\n", gettime_ms(), philo->id, str);
-		pthread_mutex_unlock(&philo->data->mtx_print);
-	}
+	int	ret;
+
+	pthread_mutex_lock(&d->mtx_end);
+	ret = d->is_end;
+	pthread_mutex_unlock(&d->mtx_end);
+	return (ret);
+}
+
+void	set_end(t_data *d)
+{
+	pthread_mutex_lock(&d->mtx_end);
+	d->is_end = 1;
+	pthread_mutex_unlock(&d->mtx_end);
+}
+
+void	print_status(t_philo *p, char *str)
+{
+	pthread_mutex_lock(&p->data->mtx_print);
+	if (check_end(p->data) == 0)
+		printf("%-6lld %d %s\n", gettime_ms() - p->data->ms_start, p->id, str);
+	pthread_mutex_unlock(&p->data->mtx_print);
 }
